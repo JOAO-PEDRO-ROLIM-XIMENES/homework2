@@ -1,0 +1,938 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{placeins}
+\usepackage{caption}
+\usepackage[brazil]{babel}
+\usepackage{amsmath} % para fórmulas matemáticas
+\usepackage{amssymb} % para fórmulas matemáticas
+\usepackage{geometry}
+\usepackage{subcaption}
+\usepackage{graphicx} %manipulação de tabelas utilizando o resizebox
+\usepackage{float} %manipular mais facilmente localização de imagens
+\usepackage{mdframed} % para spotbox
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{listings} % vai ser para que eu possa colcoar os códigos
+\usepackage{xcolor}
+% --- CONFIGURAÇÃO DE CÓDIGO ---
+\lstset{
+  language=R,
+  basicstyle=\tt\family\small,
+  keywordstyle=\color{blue},
+  commentstyle=\color{gray},
+  stringstyle=\color{red},
+  numbers=left,
+  numberstyle=\tiny,
+  stepnumber=1,
+  numbersep=8pt,
+  frame=single,
+  breaklines=true,
+  showstringspaces=false,
+  captionpos=b,
+  tabsize=2
+}
+
+\geometry{
+    a4paper,
+    left=25mm,
+    right=25mm,
+    top=20mm,
+    bottom=20mm
+}
+\newcommand{\customtitlepage}{
+    \begin{titlepage}
+        \vspace*{-0.4cm}
+        \begin{figure}[!h]
+            \centering
+            \includegraphics[width=0.5\linewidth]{imagens/logoUFC.png}
+        \end{figure}
+        \centering
+        {\large \textbf{Estatística para Engenharia}\par}
+        \vspace{6cm}
+        {\large \textbf{HOMEHORK II}\par}
+        {\large \textbf{Estatística e probabilidade}\par}
+        \vspace{5cm}
+
+        \begin{flushleft}
+            \large Dupla: 
+            \\ João Pedro Rolim Ximenes - 566235 \\
+            João Victor de Abreu Silva - 568274\\
+            Profª: Michela Mulas \\
+        \end{flushleft}
+\vspace{3cm}
+        \begin{flushleft}
+            \centering \large \textbf{18/12/2025}
+        \end{flushleft}
+        \vfill
+    \end{titlepage}
+}
+
+\begin{document}
+
+\customtitlepage
+
+\section*{Questão 1}
+
+ A partir da informação dada pela questão, parte-se do suposto que cada cliente pede ou não sobremesa independente da resposta do cliente anterior, com uma probabilidade constante de $70\%$, e considera-se uma amostra aleatória de $n=50$ clientes.
+
+A variável aleatória $X$ representa o total de clientes dessa amostra que pedem sobremesa. A partir desse modelo, a questão solicita a identificação da distribuição de probabilidade associada a $X$, o estudo de suas principais propriedades estatísticas e o cálculo de probabilidades para diferentes eventos de interesse. No caso prático, estas informações ajudariam o gerente do restaurante, em tomadas de decisões futuras.
+
+\subsection*{Item 1.1}
+
+Cada cliente do restaurante pode ser classificado em dois resultados possíveis: pedir sobremesa ou não pedir sobremesa. Assume-se que as decisões dos clientes são independentes e que a probabilidade de um cliente pedir sobremesa é constante e igual a $p=0{,}7$.
+
+Assim, a variável aleatória $X$, que representa o número de clientes que pedem sobremesa em uma amostra aleatória de $n=50$ (lembrando que neste caso, n também atua como espaço amostral) clientes, segue uma distribuição binomial com parâmetros $n=50$ e $p=0{,}7$, isto é,
+\[
+X \sim \mathrm{Binomial}(50,\,0{,}7).
+\]
+
+A função de massa de probabilidade (PMF) de $X$ é dada por
+\[
+\mathbb{P}(X = k) =
+\binom{50}{k} (0{,}7)^k (0{,}3)^{50-k},
+\quad k = 0,1,2,\ldots,50.
+\]
+
+A função de distribuição acumulada (CDF) de $X$ é definida por
+\[
+F_X(x) = \mathbb{P}(X \le x)
+= \sum_{k=0}^{\lfloor x \rfloor}
+\binom{50}{k} (0{,}7)^k (0{,}3)^{50-k},
+\quad x \in \mathbb{R},
+\]
+onde $\lfloor x \rfloor$ denota a parte inteira de $x$.
+
+\subsection*{Item 1.2}
+Utilizando a fórmula de PMF e CDF vistos na questão anterior, aplica-se a implemetação em R para a cosntrução dos gráficos, sendo que as funções "dbinom" para PMF e a "pbinom" para CDF já fazem todo o cálculo automaticamente, tornando a implementação instanânea.
+
+\begin{lstlisting}
+# Dados do enuciado
+n <- 50
+p <- 0.7
+
+# Vetor com todos os valores possiveis de X (no caso, n recebe 50, mas escrever assim torna o codigo mais dinamico)
+x <- 0:n
+
+# Calculo da PMF
+pmf <- dbinom(x, size = n, prob = p)
+
+# Grafico da PMF
+plot(x, pmf,
+     type = "h",
+     lwd = 2,
+     col = "blue",
+     main = "PMF Q1",
+     xlab = "Numero de clientes que pedem sobremesa",
+     ylab = "P(X = x)")
+\end{lstlisting}
+Este que gera a seguinte imagem:
+\begin{figure} [h]
+    \centering
+    \includegraphics[width=0.8\linewidth]{imagens/q1.1 pmf.png}
+    \caption{PMF}
+    \label{fig:placeholder}
+\end{figure}
+
+percebe-se a veracidade da imagem quando os valores mais "prováveis" estão justamente rodando perto de 0.7 x 50 = 35. \\
+ademais, para a CDF, um prompt similar é utilizado, em verdade, é substituída apenas a funão de dbinom para a de pbinom.
+
+\begin{lstlisting}
+# Dados do enuciado
+n <- 50
+p <- 0.7
+
+# Vetor com todos os valores possiveis de X (analogamente ao da PMF, os valores vao ate n = 50
+x <- 0:n
+
+# cáculo CDF
+cdf <- pbinom(x, size = n, prob = p)
+
+# Grafico da CDF
+plot(x, cdf,
+     type = "s",
+     lwd = 2,
+     col = "red",
+     main = "CDF",
+     xlab = "Numero de clientes que pedem sobremesa",
+     ylab = "P(X <= x)")
+
+\end{lstlisting}
+
+\subsection*{Item 1.3}
+
+Para uma variável aleatória com distribuição binomial $X \sim \mathrm{Binomial}(n,p)$, temos que: \\
+Na \textbf{esperança} multiplica-se a probabilidade de acontecer pela quantidade total de clientes:
+\[
+\mathbb{E}[X] = np,  \]
+Pela \textbf{variância} multiplicamos a probabilidade total de acontecer, pela quantidade de clientes, e depois pela probablidade de \textbf{não} acontencer (1-p):
+\[
+\mathrm{Var}(X) = np(1-p), \]
+Por convenção, o \textbf{desvio padrão} é a raíz da variância:
+\[\sigma_X = \sqrt{np(1-p)}.
+\]
+
+No presente caso, com $n=50$ e $p=0{,}7$, obtém-se
+\[
+\mathbb{E}[X] = 35, \quad
+\mathrm{Var}(X) = 10{,}5, \quad
+\sigma_X \approx 3{,}24.
+\]
+
+esses são os valores do calculo obtidos na mão utilziando os cálculos apresentados. Para efeito de comparação foi implmentado um prompt em R apenas para verificação dos resultados (claro que utilizando as funções já pré-estabelecidas do R):
+ \begin{lstlisting}
+n <- 50 #qntd de clientes
+p <- 0.7 #probabilidade total
+esperanca <- n * p
+variancia <- n * p * (1 - p)
+desvio_padrao <- sqrt(variancia)
+
+# resultados
+esperanca
+variancia
+desvio_padrao
+ \end{lstlisting}
+onde a saída foi a seguinte (utilizando MyCompliler online): \\
+$[1]$ 35  \\
+$[1]$ 10.5\\
+$[1]$ 3.24037\\
+
+Comparando os resultados obtidos a partir do R com os cálculos feitos a mão, percebemos que a fórmula realmente se faz útil e facilita para aplicação de maiores "samples".
+
+\subsection*{Item 1.4 }
+
+Considerando a mesma variável aleatória:
+\[
+X \sim \mathrm{Binomial}(n=50,\,p=0{,}7).
+\]
+
+\subsubsection*{(a) Probabilidade $P(X \geq 20)$}
+
+Como $X$ é uma variável aleatória discreta, a probabilidade de ocorrer pelo menos
+20 sucessos pode ser calculada utilizando a função de distribuição acumulada (CDF):
+\[
+P(X \geq 20) = 1 - P(X \leq 19).
+\]
+
+Essa abordagem evita o cálculo direto da soma de várias probabilidades individuais.
+
+O valor numérico pode ser obtido em \texttt{R} por meio do comando:
+\begin{lstlisting}[language=R]
+1 - pbinom(19, size = 50, prob = 0.7)
+\end{lstlisting}
+
+assumindo um resultado de 0.99, o que entra em concordância com o que foi visto no item 1.2, já que a maior parte dos resultados realmente serão maiores que 19.
+
+\subsubsection*{(b) Probabilidade $P(30 < X < 43)$}
+
+Como $X$ assume apenas valores inteiros, tem-se:
+\[
+P(30 < X < 43) = P(31 \leq X \leq 42).
+\]
+
+Utilizando a CDF, essa probabilidade pode ser escrita como:
+\[
+P(31 \leq X \leq 42) = P(X \leq 42) - P(X \leq 30).
+\]
+
+Em \texttt{R}, essa probabilidade é calculada por:
+\begin{lstlisting}[language=R]
+pbinom(42, size = 50, prob = 0.7) - pbinom(30, size = 50, prob = 0.7)
+\end{lstlisting}
+O que resulta em aproximadamente 0.91, o que também é bem aproximado dos valores apresnetados no gráfico. 
+\subsubsection*{(c) Probabilidade $P(X = 31)$}
+
+Para a probabilidade de um valor específico da variável aleatória, utiliza-se
+diretamente a função massa de probabilidade (PMF) da distribuição binomial:
+\[
+P(X = 31) =
+\binom{50}{31}(0{,}7)^{31}(0{,}3)^{19}.
+\]
+
+O cálculo correspondente em \texttt{R} é dado por:
+\begin{lstlisting}[language=R]
+dbinom(31, size = 50, prob = 0.7)
+\end{lstlisting}
+O que após os cálculos recebos algo aproximado de 0.06, o que também está super de acordo com os resultados do gráfico de PFM gerados anteriormente.
+
+\\
+Neste item foi utilizado de maneira um pouco mais aprofundado os conceitos de pbinom e dbinom, no caso, é perceptível que A função \texttt{dbinom} é utilizada para calcular probabilidades associadas a um valor
+específico da variável aleatória, isto é, $P(X = k)$, correspondendo à função massa de
+probabilidade (PMF). Já a função \texttt{pbinom} calcula probabilidades acumuladas da
+forma $P(X \leq k)$, correspondendo à função de distribuição acumulada (CDF), sendo
+especialmente útil para o cálculo de probabilidades em intervalos ou desigualdades.
+
+para que se possa resumir tudo em um único prompt e gerar as sáidas, pode-se realizar da seguinte forma: 
+
+\begin{lstlisting}
+# Parametros (mesmo p todos)
+n <- 50
+p <- 0.7
+
+# Probabilidade P(X ≥ 20)
+prob_a <- 1 - pbinom(19, size = n, prob = p)
+prob_a
+
+# Probabilidade P(30 < X < 43)
+prob_b <- pbinom(42, size = n, prob = p) - pbinom(30, size = n, prob = p)
+prob_b
+
+# Probabilidade P(X = 31)
+prob_c <- dbinom(31, size = n, prob = p)
+prob_c
+\end{lstlisting}
+
+Gerando as seguintes saídas:\\
+
+$[1]$ 0.9999972\\
+$[1]$ 0.9079332\\
+$[1]$ 0.05575728\\
+
+o que também entra em acordo com os resultados obtidos com os cáculos feitos na mão, com uma exatidão maior nas casas decimais.
+
+\subsection*{Item 1.5}
+
+O uso da distribuição de probabilidade da variável aleatória $X$ permite ao restaurante
+planejar o estoque de sobremesas de forma mais eficiente, incorporando explicitamente a
+incerteza associada à demanda. A partir da distribuição binomial de $X$, é possível
+estimar não apenas a demanda média esperada, mas também a variabilidade em torno
+desse valor, ajudando gerente e demais funcionários a se prepararem para os riscos possíveis, como preço faturamento, e gastos envolvidos.
+
+Em particular, o valor esperado de $X$ fornece uma referência inicial para o número
+médio de sobremesas a serem preparadas, enquanto a variância e o desvio padrão indicam
+o grau de flutuação natural da demanda diária. Com base nessas informações, o restaurante
+pode definir níveis de estoque que equilibrem o risco de desperdício, associado a estoques
+excessivos, e o risco de ruptura, associado à falta de produtos.
+
+Além disso, a função de distribuição acumulada pode ser utilizada para calcular a
+probabilidade de a demanda exceder um determinado nível de estoque. Dessa forma,
+é possível escolher uma quantidade de sobremesas que atenda a um nível de serviço
+desejado, por exemplo, garantindo que a probabilidade de falta de sobremesas seja inferior
+a um valor previamente estabelecido. Esse tipo de abordagem permite decisões mais
+informadas e baseadas em critérios probabilísticos, contribuindo para a redução de
+desperdícios e para a melhoria da eficiência operacional do restaurante, organizando não só o estoque em si, mas até mesmo controle de gastos e potenciais riscos futuros.
+\subsection*{Item 1.6}
+
+Considere a variável aleatória $X \sim \mathrm{Binomial}(n,p)$, que representa o número
+de clientes que pedem sobremesa em uma amostra de $n$ clientes, sendo $p$ a
+probabilidade individual de um cliente pedir sobremesa.
+
+\paragraph{Efeito de mudanças em $p$:} \\
+O parâmetro $p$ controla diretamente a localização e a forma da distribuição de $X$.
+À medida que $p$ aumenta, a distribuição desloca-se para a direita, indicando maior
+probabilidade de ocorrência de valores elevados de $X$. Em particular, o valor esperado
+da distribuição é dado por $\mathbb{E}[X]=np$, de modo que aumentos em $p$ produzem
+crescimento linear da média.
+
+A variância de $X$, dada por $\mathrm{Var}(X)=np(1-p)$, também é afetada por mudanças em
+$p$. Para valores fixos de $n$, a variância é máxima quando $p=0{,}5$ e diminui à medida
+que $p$ se aproxima de 0 ou de 1. Assim, ao aumentar $p$ de 0{,}7 para 0{,}8, observa-se
+um aumento do valor esperado, acompanhado de uma redução relativa da dispersão em
+torno da média, tornando a distribuição mais concentrada pois quanto maior  a probabilidade de algo dar certo, menor serão a quatidade de valores para eventuais "falhas", no caso de clientes que não queiram sobremesa.
+
+De forma geral, para valores de $p$ menores que $0{,}7$, a distribuição desloca-se para a
+esquerda, com menor valor esperado e maior assimetria à direita. Inversamente, para valores de $p$
+maiores que $0{,}7$, a distribuição desloca-se para a direita e tende a apresentar assimetria
+à esquerda, refletindo a maior probabilidade de sucesso em cada ensaio.
+
+\paragraph{Efeito de mudanças em $n$:}\\
+O parâmetro $n$ afeta principalmente a escala da distribuição e o grau de concentração
+em torno do valor esperado. Como $\mathbb{E}[X]=np$ e $\mathrm{Var}(X)=np(1-p)$, aumentos
+em $n$ elevam tanto a média quanto a variância em termos absolutos. No entanto, o
+desvio padrão cresce proporcionalmente à raiz quadrada de $n$, o que implica que, em
+termos relativos, a variabilidade diminui à medida que $n$ aumenta.
+
+Consequentemente, para valores maiores de $n$, a distribuição de $X$ torna-se mais
+concentrada em torno da média relativa $\mathbb{E}[X]/n = p$, e sua forma aproxima-se
+progressivamente de uma distribuição normal, conforme o Teorema Central do Limite.
+Por outro lado, para valores menores de $n$, a distribuição apresenta maior dispersão
+relativa e maior sensibilidade a flutuações aleatórias.
+
+\paragraph{Implicações práticas:}\\
+Do ponto de vista operacional, aumentos em $p$ indicam maior demanda esperada por
+sobremesas, exigindo ajustes no planejamento de estoque. Já aumentos em $n$ refletem
+maior volume de clientes, o que amplia a demanda total, mas torna as proporções mais
+estáveis ao viabilizar um espaço amostral mais seguro em relação ao que se rpetende estudar. A análise conjunta de $p$ e $n$ permite ao restaurante antecipar diferentes
+cenários de demanda e definir estratégias de estoque que equilibrem risco de desperdício
+e risco de escassez, com base em critérios probabilísticos bem definidos.
+
+
+\section*{Questão 2}
+\subsection*{Item 2.1}
+Cada visitante do site tem uma probabilidade muito pequena de ganhar a recompensa, enquanto o número total de visitantes é extremamente grande. Nessas condições, o número de vencedores em um dia segue uma distribuição binomial com parâmetros \(n = 10^7\) e \(p = 10^{-7}\). No entanto, como \(n\) é grande e \(p\) é pequeno, com \(np = 1\), essa distribuição pode ser bem aproximada por uma distribuição de Poisson com parâmetro \(\lambda = np = 1\). Assim, a função de massa de probabilidade do número de vencedores pode ser aproximada por algo como:
+\[
+P(X = k) \approx \frac{e^{-1}}{k!}, \quad k = 0,1,2,\ldots
+\]
+\begin{lstlisting}
+#codigo pratico para a demonstrar a formula
+n <- 1e7 
+p <- 1e-7
+lambda <- n*p
+k <- 0:10
+pmf_poisson <- dpois(k, lambda)
+resultado <- data.frame(
+  k = k,
+  Probabilidade = pmf_poisson
+)
+print(resultado)
+barplot(
+  pmf_poisson,
+  names.arg = k,
+  col = "lightblue",
+  main = "PMF Aproximada: X ~ Poisson(1)",
+  xlab = "Numero de vencedores (k)",
+  ylab = "P(X = k)"
+)
+\end{lstlisting}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imagens/q2.home.png}
+    \caption{Gráfico da distribuição de Poisson(1) para o numero de vencedores em um dia.}
+\end{figure}
+
+\subsection*{Item 2.2}
+Nosso valor esperado e a variância do número de vencedores podem ser calculados tanto a partir da distribuição binomial exata quanto da aproximação de Poisson. Para a distribuição binomial, o valor esperado é dado por \(E[X] = np\) e a variância por \(\mathrm{Var}(X) = np(1-p)\). Já para a distribuição de Poisson com parâmetro \(\lambda = np\), tanto o valor esperado quanto a variância são iguais a \(\lambda\).\(p\) é extremamente pequeno, espera-se que os resultados obtidos pelas duas abordagens sejam praticamente idênticos.
+
+\begin{lstlisting}
+#codigo para os 4 resultados:
+n <- 1e7
+p <- 1e-7
+lambda <- n*p
+E_binomial <- n*p
+E_poisson <- lambda
+Var_binomial <- n*p*(1 - p)
+Var_poisson <- lambda
+resultado <- data.frame(
+  Distribuicao = c("Binomial","Poisson"),
+  Esperanca = c(E_binomial, E_poisson),
+  Variancia = c(Var_binomial, Var_poisson)
+)
+
+print(resultado)
+
+\end{lstlisting}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imagens/q2.2.home.jpeg}
+    \caption{Comprovando a teoria com a saída do código}
+\end{figure}
+Observou-se que o valor esperado é exatamente o mesmo nas duas distribuições, enquanto a variância difere apenas por um fator \(1-p\), que é praticamente igual a 1 devido ao valor muito pequeno do \(p\). Dessa forma, a aproximação de Poisson fornece resultados basicamente idênticos aos da distribuição binomial exata neste contexto.
+
+
+
+\subsection*{Item 2.3}
+
+Suponha que você seja um dos vencedores da recompensa, mas que possam existir outros vencedores no mesmo dia. Seja \(W \sim \text{Poisson}(1)\) o número de vencedores além de você. Se houver mais de um vencedor, o prêmio é sorteado de forma uniforme entre todos. Assim, se houver \(W = w\) outros vencedores, o total de vencedores será \(w+1\), e a probabilidade de você receber o prêmio é \(1/(w+1)\). Para obter a probabilidade total para que você realmente ganhe o prêmio, é necessário calcular o valor esperado dessa quantidade em relação à distribuição de \(W\), ou seja,
+\[
+P(\text{ganhar o prêmio}) = \mathbb{E}\left[\frac{1}{W+1}\right].
+\]
+
+\begin{lstlisting}
+lambda <- 1
+w <- 0:20
+prob_ganhar_dado_w <- 1/(w + 1)
+pmf_w <- dpois(w, lambda)
+prob_ganhar <- sum(prob_ganhar_dado_w * pmf_w)
+print(prob_ganhar)
+\end{lstlisting}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imagens/q2.3.home.jpeg}
+    \caption{resultado encontrado}
+\end{figure}
+O valor obtido representa a probabilidade média de você receber o prêmio, levando em conta todas as possibilidades para o número de outros vencedores. Assim, quanto maior o número de vencedores adicionais, menor é sua chance individual de ganhar. No entanto, como a distribuição de Poisson com parâmetro 1 atribui probabilidades maiores a valores pequenos de \(W\), o efeito médio ainda resulta em uma probabilidade relativamente significativa de você receber o prêmio.
+
+
+
+
+\subsection*{Item 2.4}
+AVISO IMPORTANTE: neste item foi usado o CHAT GPT para corrigir o código que não estava gerando os resultados adequados. Portanto, os comentários do código são de autoria dessa IA.
+\\
+\\
+Para avaliar a qualidade da aproximação de Poisson utilizada anteriormente, foram geradas simulações de um grande número de dias, onde cada dia corresponde a um valor aleatório para o número de vencedores. Como o número de vencedores em um dia é bem aproximado por uma distribuição de Poisson com parâmetro \(\lambda = 1\), as simulações foram realizadas a partir dessa distribuição. Em seguida, a distribuição empírica obtida pelas simulações foi comparada visualmente com a distribuição teórica de Poisson.
+
+\begin{lstlisting}
+# Numero de dias simulados
+N <- 100000
+
+# Simulacao do numero de vencedores por dia
+X_sim <- rpois(N, lambda = 1)
+
+# Valores possiveis
+k <- 0:max(X_sim)
+
+# Frequencias empiricas
+freq_empirica <- table(X_sim) / N
+
+# PMF teorica da Poisson(1)
+pmf_poisson <- dpois(k, lambda = 1)
+
+# Grafico comparativo
+barplot(
+  freq_empirica,
+  col = "lightblue",
+  main = "Comparacao entre simulacao e Poisson(1)",
+  xlab = "Numero de vencedores",
+  ylab = "Probabilidade empirica"
+)
+
+points(
+  k + 1,
+  pmf_poisson,
+  col = "red",
+  pch = 16
+)
+
+legend(
+  "topright",
+  legend = c("Simulacao", "Poisson(1)"),
+  fill = c("lightblue", NA),
+  border = NA,
+  pch = c(NA, 16),
+  col = c("black", "red")
+)
+\end{lstlisting}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imagens/q2.4.home.png}
+    \caption{Comparação entre a distribuição empírica obtida por simulação e a distribuição de Poisson(1).}
+\end{figure}
+
+A visualização mostra que as probabilidades empíricas obtidas a partir das simulações estão muito próximas das probabilidades teóricas da distribuição de Poisson. Os valores mais prováveis coincidem e a forma geral das distribuições é bastante semelhante, indicando que a aproximação de Poisson fornece uma descrição adequada do comportamento do número de vencedores em um dia.
+\section*{Questão 3}
+\subsection*{Item 3.1(a)}
+
+Ao simular medições de temperatura com distribuição normal, é necessário transformar variáveis aleatórias com distribuição uniforme em variáveis normalmente distribuídas. Uma forma para realizar essa transformação é o método de Box--Muller. Esse método parte de duas variáveis aleatórias independentes \(U_1\) e \(U_2\), ambas distribuídas uniformemente no intervalo \((0,1)\), isto é,
+\[
+U_1, U_2 \sim \text{Unif}(0,1).
+\]
+A partir dessas variáveis, o método de Box--Muller define as transformações
+\[
+Z_1 = \sqrt{-2 \ln(U_1)} \cos(2\pi U_2)
+\quad \text{e} \quad
+Z_2 = \sqrt{-2 \ln(U_1)} \sin(2\pi U_2),
+\]
+onde as variáveis \(Z_1\) e \(Z_2\) obtidas possuem distribuição normal padrão, ou seja,
+\[
+Z_1, Z_2 \sim \mathcal{N}(0,1).
+\]
+Dessa forma, é possível gerar valores normalmente distribuídos a partir de geradores uniformes simples, que são amplamente utilizados em ambientes computacionais.
+
+\begin{lstlisting}
+box_muller <- function(n) {
+  U1 <- runif(n) #esse runif vai ser muito utilizado nessa questão, e eh quem gera as variaveis aleatorias
+  U2 <- runif(n)
+  
+  #funcao dada na questao
+  Z1 <- sqrt(-2*log(U1))*cos(2*pi*U2)
+  Z2 <- sqrt(-2*log(U1))*sin(2*pi*U2)
+  return(c(Z1,Z2))
+}
+Z <- box_muller(500)
+
+\end{lstlisting}
+\subsection*{Item 3.1(b)}
+A partir das duas variáveis aleatórias independentes \(U_1\) e \(U_2\), geradas com distribuição uniforme no intervalo \((0,1)\), o método de Box--Muller permite calcular diretamente duas variáveis aleatórias independentes com distribuição normal padrão. Essas variáveis são definidas pelas formulas:
+\[
+Z_1 = \sqrt{-2 \ln(U_1)} \cos(2\pi U_2),
+\quad
+Z_2 = \sqrt{-2 \ln(U_1)} \sin(2\pi U_2).
+\]
+As variáveis \(Z_1\) e \(Z_2\) obtidas por meio dessas transformações são independentes e seguem uma distribuição normal padrão.
+\[
+Z_1, Z_2 \sim \mathcal{N}(0,1).
+\]
+Para facilitar a análise, os valores \(Z_1\) e \(Z_2\) são concatenados em um único vetor \(Z\), que representa um conjunto de observações normalmente distribuídas com média zero e variância unitária.
+
+\begin{lstlisting}
+U1 <- runif(1)
+U2 <- runif(1)
+Z1 <- sqrt(-2*log(U1))*cos(2*pi*U2)
+Z2 <- sqrt(-2*log(U1))*sin(2*pi*U2)
+Z <- c(Z1, Z2)
+print(Z)
+\end{lstlisting}
+\subsection*{Item 3.1(c)}
+
+Uma vez obtidos os valores normalmente distribuídos com média zero e DP unitários,
+representados pelo vetor $Z$, é necessário convertê-los para a distribuição que modela
+a temperatura da CPU. Sabe-se que a temperatura em regime estacionário segue uma
+distribuição normal com média $\mu = 62^\circ\mathrm{C}$ e desvio padrão (estes que são os valores dados nos itens anteriores)
+$\sigma = 3{,}5^\circ\mathrm{C}$.
+
+Essa conversão é realizada por meio de uma transformação linear dos valores de $Z$,
+dada por
+\[
+T = \mu + \sigma Z,
+\]
+ou, de forma explícita (com os dados utilizados),
+\[
+T = 62 + 3{,}5\,Z.
+\]
+
+Essa transformação preserva a normalidade dos dados, deslocando a média da distribuição
+de $0$ para $62$ e escalando sua dispersão de acordo com o desvio padrão e média desejadas.
+Como consequência, a variável aleatória $T$ segue a distribuição
+\[
+T \sim \mathcal{N}(62,\,3{,}5),
+\]
+representando adequadamente as medições simuladas da temperatura da CPU. Utilizando este conceito acima, somado às funções propostas dos itens anteriores, temos uma forma "completa" de representar da seguinte maneira:
+
+\begin{lstlisting}
+# Dados da questao
+mu <- 62
+sigma <- 3.5
+
+# essa parte eh a mesma vista nos codigos anteriores.
+U1 <- runif(1)
+U2 <- runif(1)
+Z1 <- sqrt(-2 * log(U1)) * cos(2 * pi * U2)
+Z2 <- sqrt(-2 * log(U1)) * sin(2 * pi * U2)
+Z <- c(Z1, Z2)
+
+# NEW!! Conversao dos valores normais padrão para temperaturas da CPU utilizando a formula explicitada
+T_cpu <- mu + sigma * Z
+\end{lstlisting}
+\subsection*{Item 3.2}
+Com a função desenvolvida nos itens anteriores, é possível gerar medições de temperatura da CPU a partir do método de Box--Muller, utilizando apenas variáveis aleatórias uniformes como entrada. Para analisar o comportamento desse gerador, foram simuladas 1.000 medições de temperatura da CPU, assumindo uma distribuição normal com média \(\mu = 62\,^\circ\text{C}\) e desvio padrão \(\sigma = 3.5\,^\circ\text{C}\). Em seguida, para fins de comparação, foram geradas mais 1.000 medições utilizando o gerador de números aleatórios normal embutido do R, com os mesmos parâmetros. O objetivo é verificar se ambos os métodos produzem resultados estatisticamente semelhantes.
+\begin{lstlisting}
+# Funcao Box-Muller
+box_muller <- function(n) {
+  U1 <- runif(n)
+  U2 <- runif(n)
+  Z1 <- sqrt(-2*log(U1))*cos(2*pi*U2)
+  Z2 <- sqrt(-2*log(U1))*sin(2*pi*U2)
+  return(c(Z1, Z2))
+}
+n <- 1000
+#(Box-Muller)
+Z_box <- box_muller(n / 2)
+T_box <- 62+3.5*Z_box
+T_rnorm <- rnorm(n, mean = 62, sd = 3.5)
+head(T_box)
+head(T_rnorm)
+\end{lstlisting}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{imagens/q3.2.home.jpeg}
+    \caption{Algumas saídas para mostrar na prática o gerador.}
+\end{figure}
+Ao comparar as medições de temperatura geradas pelo método de Box--Muller com aquelas obtidas pelo gerador normal embutido do R, observa-se que ambos os conjuntos de dados apresentam valores compatíveis com a distribuição normal esperada. As temperaturas simuladas estão concentradas em torno da média de \(62\,^\circ\text{C}\), com variação coerente com o desvio padrão de \(3.5\,^\circ\text{C}\). Visualmente e numericamente, não há diferenças significativas entre os dois métodos, indicando que o gerador construído a partir do método de Box--Muller reproduz adequadamente o comportamento do gerador normal padrão do R.
+
+\subsection*{Item 3.3 (a)(b)(c)}
+COMO OBSERVAÇÃO para os subitens, é importante ressaltar que como são utilizadas variáveis aleatórias, geradas pelo próprio prompt em R, não necessariamente teremos os resultados de exemplo mostrado no item anterior, em verdade, todas as vezes que o código for 'runado', os valores deverão ser teoricamente diferentes (até porque este é o conceito de variável aleatória) mas, como é seguido um padrão, o que deve ser analisado nesta questão, analogamente ao item anterior, é que os resultados devem ser muito próximos.
+
+Ademais, o mesmo código foi feito já com as respostas dos itens a b, c, para garantir que o mesmo espaço amostral fosse analisado em todos os casos. 
+
+O código utilizado foi o seguinte (complementando as funções vistas no item 3.2):
+
+\begin{lstlisting}
+# Função Box-Muller
+box_muller <- function(n) {
+U1 <- runif(n)
+U2 <- runif(n)
+Z1 <- sqrt(-2 * log(U1)) * cos(2 * pi * U2)
+Z2 <- sqrt(-2 * log(U1)) * sin(2 * pi * U2)
+return(c(Z1, Z2))
+}
+n <- 1000
+# Geracao via Box-Muller
+Z_box <- box_muller(n / 2)
+T_box <- 62 + 3.5 * Z_box
+# Geracao via rnorm
+T_rnorm <- rnorm(n, mean = 62, sd = 3.5)
+
+#respondendo ao 3.3 a,b e c
+#estatisticas amostrais - Box-Muller 
+mean_box <- mean(T_box)
+sd_box <- sd(T_box)
+min_box <- min(T_box)
+max_box <- max(T_box)
+
+# Estatisticas amostrais - rnorm
+mean_rnorm <- mean(T_rnorm)
+sd_rnorm <- sd(T_rnorm)
+min_rnorm <- min(T_rnorm)
+max_rnorm <- max(T_rnorm)
+
+# Exibicao dos resultados
+print("Media, DP, maximo e minimo - Box-Muller(respectivamente):")
+mean_box; sd_box; min_box; max_box
+print("Media, DP, maximo e minimo - Box-Muller normal(respectivamente):")
+mean_rnorm; sd_rnorm; min_rnorm; max_rnorm
+
+\end{lstlisting}
+
+em uma das copilações de teste, o seguinte resultado (com os prints já do próprio código) foi o seguinte:
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{imagens/q3.3.homeabc.png}
+    \caption{Resultados}
+    \label{fig:placeholder}
+\end{figure}
+
+Note que os resultados de cima se tratam do Box Muller comum, equanto os de baixo são respectivamente a média, desvio padrão, mínimo e máximo do gerador normal.
+
+Como foi proposto, é perceptível a semelhança entre os resultados, e isto ocorreu em todas as vezes que foram simulados os resultados.
+
+\subsection*{Itens 3.3 (d)(e)(f)}
+
+Antes de analisar as probabilidades empíricas e teóricas associadas aos diferentes
+eventos, é importante apresentar o modelo probabilístico adotado para a temperatura da
+CPU. Assume-se que, em regime estacionário, a temperatura segue uma distribuição
+normal com média $\mu = 62^\circ\mathrm{C}$ e desvio padrão $\sigma = 3{,}5^\circ\mathrm{C}$,
+isto é,
+\[
+T \sim \mathcal{N}(62,\,3{,}5^2).
+\]
+
+A função densidade de probabilidade associada a essa distribuição é dada por
+\[
+f_T(t) =
+\frac{1}{\sigma\sqrt{2\pi}}
+\exp\!\left(
+-\frac{(t-\mu)^2}{2\sigma^2}
+\right),
+\quad t \in \mathbb{R}.
+\]
+
+Com base nesse modelo teórico, as probabilidades consideradas a seguir são obtidas
+analiticamente por meio da função de distribuição acumulada da normal e comparadas
+com estimativas empíricas derivadas dos dados simulados.
+
+Para o que é proposto nas questões, usamos a relação mais simplificada, pois o resultado da exponencial já é algo constante, portanto é utilizado que: 
+\[
+Z = \frac{X - \mu}{\sigma}
+\]
+onde Z é resultado de uma transformação a partir de uma tabela que relaciona constantes.
+Para os resultados dessa questão, são esperados pequenos desvios entre os resultados, isso ocorre devido a aleatoriedade de cada um dos dados gerados, ademais, como é apresentado um espaço amostral finito, os dados são mutáveis, algo que diminui conforme é adicionado ao número total de amostras.
+
+É importante ressaltar também que os prompts adicionados na resolução destes itens NÃO funcionam sozinhos. Eles devem ser utilizados após o que está apresentado no item 3.2, inclusive na própria resulução anterior de 3.3(a)(b)(c), visto que é neste item onde foi realizado todas as conversões principais de Box-Muller, sendo este o prompt ja atrelado anteriormente aos itens:
+
+\begin{lstlisting}
+box_muller <- function ( n ) {
+U1 <- runif ( n )
+U2 <- runif ( n )
+Z1 <- sqrt ( -2 * log ( U1 ) ) * cos (2 * pi * U2 )
+Z2 <- sqrt ( -2 * log ( U1 ) ) * sin (2 * pi * U2 )
+return ( c ( Z1 , Z2 ) )
+}
+n <- 1000
+Z_box <- box_muller ( n / 2)
+T_box <- 62 + 3.5 * Z_box
+T_rnorm <- rnorm (n , mean = 62 , sd = 3.5)
+\end{lstlisting}
+
+
+\subsection*{Item 3.3(d)}
+
+A probabilidade de a temperatura da CPU exceder $68^\circ\mathrm{C}$ pode ser analisada
+tanto do ponto de vista teórico quanto empírico. Teoricamente, considerando que
+$T \sim \mathcal{N}(62,\,3{,}5^2)$, essa probabilidade é obtida por meio da função de
+distribuição acumulada da normal padrão, após a devida padronização da variável. 
+
+Do ponto de vista empírico, a probabilidade é estimada pela proporção de observações
+simuladas cuja temperatura ultrapassa $68^\circ\mathrm{C}$. Os resultados obtidos a partir
+dos dois conjuntos de dados simulados (Box--Muller e \texttt{rnorm()}) mostram valores
+próximos entre si e também próximos da probabilidade teórica, como prompt para isso:
+\begin{lstlisting}
+#empirica
+prob_emp_box_68 <- mean(T_box > 68)
+prob_emp_rnorm_68 <- mean(T_rnorm > 68)
+# teorica
+prob_teo_68 <- 1 - pnorm(68, mean = 62, sd = 3.5)
+#plot
+prob_emp_box_68
+prob_emp_rnorm_68
+prob_teo_68
+\end{lstlisting}
+
+Uma possível saída para este é:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{imagens/q3.3(d).png}
+    \caption{Saída item d}
+    \label{fig:placeholder}
+\end{figure}
+
+Para efeito de comparação, utilizando a fórmula citada anteriormente, a saída teórica é a seguinte:
+
+Utilizando o valor padronizado obtido,
+\[
+Z = \frac{68 - 62}{3{,}5} \approx 1{,}71,
+\]
+a probabilidade teórica é dada por
+\[
+P(T > 68) = P(Z > 1{,}71) = 1 - \Phi(1{,}71) \approx 0{,}043.
+\]
+entrando em concordância com os valores obtidos a partir do algoritmo.
+
+
+\subsection*{Item 3.3(e)}
+
+A probabilidade de a temperatura da CPU situar-se entre $60^\circ\mathrm{C}$ e
+$65^\circ\mathrm{C}$ corresponde a um intervalo central da distribuição, próximo ao valor
+esperado. Teoricamente, essa probabilidade é calculada como a diferença entre os valores
+da função de distribuição acumulada avaliados nos limites superior e inferior do intervalo considerado.
+
+Observa-se que, por se tratar de um intervalo com
+probabilidade relativamente elevada, temos dentro deste intervalo, os valores centrais. Sendo assim, o prompt utilizado foi: 
+\begin{lstlisting}
+#emprica
+prob_emp_box_60_65 <- mean(T_box > 60 & T_box < 65)
+prob_emp_rnorm_60_65 <- mean(T_rnorm > 60 & T_rnorm < 65)
+#teorica
+prob_teo_60_65 <- pnorm(65, mean = 62, sd = 3.5) - pnorm(60, mean = 62, sd = 3.5)
+#plot
+prob_emp_box_60_65
+prob_emp_rnorm_60_65
+prob_teo_60_65
+\end{lstlisting}
+
+como no item anterior, uma possível saída é:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=1\linewidth]{imagens/q3.3(e).png}
+    \caption{Saída item e}
+    \label{fig:placeholder}
+\end{figure}
+
+Para o cálculo teórico da probabilidade $P(60 < T < 65)$, a variável aleatória $T$ é
+padronizada utilizando a transformação da normal padrão,
+\[
+Z = \frac{T - \mu}{\sigma}.
+\]
+
+Substituindo $\mu = 62^\circ\mathrm{C}$ e $\sigma = 3{,}5^\circ\mathrm{C}$, obtêm-se os valores
+padronizados correspondentes aos limites do intervalo:
+\[
+Z_1 = \frac{60 - 62}{3{,}5} \approx -0{,}57,
+\qquad
+Z_2 = \frac{65 - 62}{3{,}5} \approx 0{,}86.
+\]
+
+Assim, a probabilidade teórica pode ser escrita como
+\[
+P(60 < T < 65) = P(-0{,}57 < Z < 0{,}86)
+= \Phi(0{,}86) - \Phi(-0{,}57) \approx 0{,}52.
+\]
+
+\subsection*{Item 3.3(f)}
+
+A probabilidade de a temperatura da CPU exceder $75^\circ\mathrm{C}$ representa um evento
+extremo no contexto da distribuição considerada. A análise teórica indica que essa
+probabilidade é extremamente baixa, situando-se na cauda superior da distribuição
+normal.
+
+Em função desse valor reduzido, é pouco provável que tal evento seja observado em
+amostras de tamanho moderado, como as simulações realizadas com 1.000 observações.
+
+Para o cálculo teórico da probabilidade $P(T > 75)$, a variável aleatória $T$ é
+padronizada por meio da transformação da normal padrão,
+\[
+Z = \frac{T - \mu}{\sigma}.
+\]
+
+Substituindo $\mu = 62^\circ\mathrm{C}$, $\sigma = 3{,}5^\circ\mathrm{C}$ e $T = 75^\circ\mathrm{C}$,
+obtém-se
+\[
+Z = \frac{75 - 62}{3{,}5} \approx 3{,}71.
+\]
+
+Assim, a probabilidade teórica é dada por
+\[
+P(T > 75) = P(Z > 3{,}71) = 1 - \Phi(3{,}71) \approx 0{,}0001.
+\]
+De fato, a ausência de valores acima de $75^\circ\mathrm{C}$ nos conjuntos de dados
+simulados está de acordo com a probabilidade teórica estimada. Esse resultado ilustra
+um princípio fundamental da simulação estatística: eventos raros requerem tamanhos
+de amostra significativamente maiores para serem observados com frequência
+apreciável.
+
+OBS: Para efeito de simplificação deste item, não colocaremos os códigos utilizados, visto que estes já foram bem exemplificados no resto do escopo deste mesmo documento. Mas as simulações com saídas de valores acima dos 75, só puderam ser vistas a partir de 10000 experimentos, o que entra em total acordo com a forma da distribuição, pois quanto maior o espaço amostral, maior a probabilidade de haver algum resultado discrepante do previsto.
+
+\subsection*{Item 3.4(a)(b)}
+
+Para visualizar os resultados das simulações, foram construídos histogramas das temperaturas da CPU obtidas nos itens anteriores. Esses histogramas permitem observar a distribuição empírica das medições simuladas e verificar se elas apresentam o comportamento esperado de uma distribuição normal. Além disso, a função densidade de probabilidade (PDF) da distribuição normal teórica, com média \(\mu = 62\,^\circ\text{C}\) e desvio padrão \(\sigma = 3.5\,^\circ\text{C}\), foi sobreposta aos histogramas, possibilitando uma comparação direta entre os dados simulados e o modelo teórico.
+
+\begin{lstlisting}
+# Histograma - Box-Muller
+hist(
+  T_box,
+  probability = TRUE,
+  col = "lightblue",
+  main = "Temperaturas da CPU - Box-Muller",
+  xlab = "Temperatura (°C)"
+)
+
+# Curva teorica normal
+x <- seq(min(T_box), max(T_box), length.out = 1000)
+lines(x, dnorm(x, mean = 62, sd = 3.5), col = "red", lwd = 2)
+
+# Histograma - rnorm
+hist(
+  T_rnorm,
+  probability = TRUE,
+  col = "lightgreen",
+  main = "Temperaturas da CPU - rnorm",
+  xlab = "Temperatura (°C)"
+)
+
+# Curva teorica normal
+x <- seq(min(T_rnorm), max(T_rnorm), length.out = 1000)
+lines(x, dnorm(x, mean = 62, sd = 3.5), col = "red", lwd = 2)
+\end{lstlisting}
+
+\subsection*{Item 3.5}
+
+As distribuições empíricas das temperaturas simuladas por meio do gerador manual
+(Box--Muller) e do gerador embutido do \texttt{R} apresentaram boa aderência à curva
+normal teórica com média $62^\circ\mathrm{C}$ e desvio padrão $3{,}5^\circ\mathrm{C}$. Essa
+aderência pode ser quantificada comparando as probabilidades empíricas obtidas com
+os valores teóricos correspondentes.
+
+Para o evento $P(T > 68)$, obteve-se uma probabilidade empírica de aproximadamente
+$0{,}041$ utilizando o método de Box--Muller e $0{,}044$ utilizando o gerador
+\texttt{rnorm()}, enquanto a probabilidade teórica calculada foi $0{,}04323813$.
+A diferença percentual entre o valor empírico do Box--Muller e o valor teórico é dada por
+\[
+\frac{|0{,}041 - 0{,}04323813|}{0{,}04323813} \times 100 \approx 5{,}18\%,
+\]
+enquanto, para o gerador \texttt{rnorm()}, a diferença percentual é
+\[
+\frac{|0{,}044 - 0{,}04323813|}{0{,}04323813} \times 100 \approx 1{,}76\%.
+\]
+
+De forma análoga, para o evento $P(60 < T < 65)$, as probabilidades empíricas obtidas
+foram aproximadamente $0{,}506$ (Box--Muller) e $0{,}538$ (\texttt{rnorm()}), enquanto
+o valor teórico calculado foi $0{,}5204624$. A diferença percentual em relação ao valor
+teórico é
+\[
+\frac{|0{,}506 - 0{,}5204624|}{0{,}5204624} \times 100 \approx 2{,}78\%
+\]
+para o método de Box--Muller, e
+\[
+\frac{|0{,}538 - 0{,}5204624|}{0{,}5204624} \times 100 \approx 3{,}37\%
+\]
+para o gerador \texttt{rnorm()}.
+
+Esses resultados indicam que ambas as abordagens produzem estimativas empíricas
+coerentes com a distribuição normal teórica. As diferenças percentuais observadas são
+pequenas e compatíveis com a variabilidade estatística esperada para amostras de
+tamanho finito ($n = 1000$). Não se observam diferenças estruturais relevantes entre o
+conjunto de dados gerado pelo RNG manual e aquele produzido pelo RNG embutido do
+\texttt{R}$, sendo as discrepâncias atribuídas principalmente a flutuações aleatórias.
+
+Por fim, esse tipo de simulação permite avaliar a probabilidade de ocorrência de eventos
+críticos de temperatura, fornecendo subsídios para o dimensionamento de estratégias de
+resfriamento e de escalonamento dinâmico de clock. O uso de geradores uniformes como
+base dos sistemas de RNG é essencial, pois eles constituem o alicerce matemático sobre
+o qual são construídas transformações capazes de gerar distribuições mais complexas,
+como a normal.
+
+
+
+
+\end{document}
