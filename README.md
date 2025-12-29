@@ -68,4 +68,8 @@ foram realizadas **conjuntamente por João Victor e João Pedro**.
 - **Git/GitHub** — Controle de versão e organização do projeto
 - **CHAT GPT** - usado para revisão de códigos e correção gramatical
 
+---
+## OBS
+
+É importante ressaltar que todos os conteúdos desse documento foram realizados, alterados e estudados ao longo de dias, mas o GITHUB foi feito por último, no entanto, no que vem dos alunos, tudo foi feito da maneira mais íntegra e dinâmica possível. Como relator deste, afirmo que tive pelo menos 4 dias do meu recesso focados apenas neste, e afirmo que meu parceiro teve o mesmo nível de dedicação.
 
