@@ -66,9 +66,6 @@ foram realizadas **conjuntamente por João Victor e João Pedro**.
 - **R** — Simulação estatística e análise computacional  
 - **LaTeX (Overleaf)** — Elaboração do relatório final  
 - **Git/GitHub** — Controle de versão e organização do projeto
-- **CHAT GPT - usado para revisão de códigos e correção gramatical
+- **CHAT GPT** - usado para revisão de códigos e correção gramatical
 
----
-
-## 📁 Estrutura do Repositório
 
